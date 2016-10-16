@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <string>
 
-class render {
+class renderer {
     std::string vertexShaderSource;
     std::string fragmentShaderSource;
 
@@ -21,8 +21,13 @@ class render {
     GLuint uFragColorHandle;
 
 public:
-    void init();
+    renderer() {};
 
+    void init();
+    void render();
+    void surfaceCreated();
+    void surfaceChanged(int w, int h);
+    void update();
 };
 
 

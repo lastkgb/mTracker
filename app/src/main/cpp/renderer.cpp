@@ -8,19 +8,9 @@
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
 
+#include <cassert>
+
 #include "renderer.h"
-
-auto gVertexShader =
-        "attribute vec4 vPosition;\n"
-                "void main() {\n"
-                "  gl_Position = vPosition;\n"
-                "}\n";
-
-auto gFragmentShader =
-        "precision mediump float;\n"
-                "void main() {\n"
-                "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
-                "}\n";
 
 const GLfloat cube[] = {
         -0.5f, 0.5f, 0f,
@@ -32,9 +22,46 @@ const GLfloat cube[] = {
 
 const short drawOrder[] = {0, 1, 2, 3};
 
-//void renderer::glInit(AAssetManager *assetManager) {
-void renderer::glInit() {
 
+GLuint loadShader(GLenum shaderType, const std::string& pSource) {
+    GLuint shader = glCreateShader(shaderType);
+    assert(shader != 0);
+    const char *sourceBuf = pSource.c_str();
+    glShaderSource(shader, 1, &sourceBuf, NULL);
+    glCompileShader(shader);
+    GLint shaderCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &shaderCompiled);
+    assert(shaderCompiled != 0);
+    return shader;
+}
+
+GLuint createProgram(const std::string& pVertexSource, const std::string& pFragmentSource) {
+    GLuint vertexShader = loadShader(GL_VERTEX_SHADER, pVertexSource);
+    GLuint pixelShader = loadShader(GL_FRAGMENT_SHADER, pFragmentSource);
+    GLuint program = glCreateProgram();
+    assert(program != 0);
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, pixelShader);
+    glLinkProgram(program);
+    GLint programLinked = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &programLinked);
+    assert(programLinked != 0);
+    glDeleteShader(vertexShader);
+    glDeleteShader(pixelShader);
+    return program;
+}
+
+void renderer::init() {
+    vertexShaderSource =
+            "attribute vec4 vPosition;\n"
+                    "void main() {\n"
+                    "  gl_Position = vPosition;\n"
+                    "}\n";
+    fragmentShaderSource =
+            "precision mediump float;\n"
+                    "void main() {\n"
+                    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
+                    "}\n";
 }
 
 void renderer::surfaceCreated() {
@@ -43,21 +70,29 @@ void renderer::surfaceCreated() {
     LOGI("GL_RENDERER: %s", glGetString(GL_RENDERER));
     LOGI("GL_EXTENSIONS: %s", glGetString(GL_EXTENSIONS));
 
-
+    shaderProgram = createProgram(vertexShaderSource, fragmentShaderSource);
+    assert(shaderProgram != 0);
 }
 
 void renderer::render() {
 
 }
+
+void renderer::surfaceChanged(int w, int h) {
+    glViewport(0, 0, w, h);
+}
+
+void renderer::update() {
+
+}
+
 renderer gRenderer;
 
 extern "C" {
     JNIEXPORT void JNICALL
-    Java_com_example_lastkgb_mtracker_RendererJNI_init(
-            JNIEnv *env, jclass type, jobject assetManager) {
+    Java_com_example_lastkgb_mtracker_RendererJNI_init(JNIEnv *env, jclass type) {
         (void) type;
-        AAssetManager *nativeAssetManager = AAssetManager_fromJava(env, assetManager);
-        gRenderer.init(nativeAssetManager);
+        gRenderer.init();
     }
 
     JNIEXPORT void JNICALL
