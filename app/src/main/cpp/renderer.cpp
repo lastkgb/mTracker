@@ -54,14 +54,14 @@ GLuint createProgram(const std::string& pVertexSource, const std::string& pFragm
 void renderer::init() {
     vertexShaderSource =
             "attribute vec4 vPosition;\n"
-                    "void main() {\n"
-                    "  gl_Position = vPosition;\n"
-                    "}\n";
+            "void main() {\n"
+            "  gl_Position = vPosition;\n"
+            "}\n";
     fragmentShaderSource =
             "precision mediump float;\n"
-                    "void main() {\n"
-                    "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
-                    "}\n";
+            "void main() {\n"
+            "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
+            "}\n";
 }
 
 void renderer::surfaceCreated() {
