@@ -1,48 +1,29 @@
 package com.example.lastkgb.mtracker;
 
 import android.app.Activity;
-//import android.opengl.EGLConfig;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
+import android.util.Log;
 
 public class MainActivity extends Activity {
 
-    private GLSurfaceView mView;
+    private TrackerSurfaceView mView;
+    private TrackerRenderer mRenderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mView = new GLSurfaceView(this);
-        mView.setEGLContextClientVersion(2);
-        mView.setRenderer(new GLSurfaceView.Renderer() {
-            @Override
-            public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-                RendererJNI.surfaceCreated();
-            }
-
-            @Override
-            public void onSurfaceChanged(GL10 gl, int width, int height) {
-                RendererJNI.surfaceChanged(width, height);
-            }
-
-            @Override
-            public void onDrawFrame(GL10 gl) {
-                RendererJNI.drawFrame();
-            }
-        });
-        // Render the view only when there is a change in the drawing data
-        mView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        mView = new TrackerSurfaceView(this);
+        mRenderer = mView.getRenderer();
         mView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                RendererJNI.glInit(getAssets());
+                Log.i("MAIN", "[onCreate] Runnable run called");
+                mRenderer.positionInit();
             }
         });
         setContentView(mView);
+        Log.i("MAIN", "onCreate called");
     }
 
     @Override protected void onPause() {
@@ -51,7 +32,7 @@ public class MainActivity extends Activity {
         mView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                RendererJNI.pause();
+                mRenderer.pause();
             }
         });
     }
@@ -62,9 +43,15 @@ public class MainActivity extends Activity {
         mView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                RendererJNI.resume();
+                mRenderer.resume();
             }
         });
+    }
+
+    public void update(float angleX, float angleY)
+    {
+        Log.d("MAIN", "update called");
+        mView.update(angleX, angleY);
     }
 
 }
