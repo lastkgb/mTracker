@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -landroid -llog")
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -landroid -llog")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -17,8 +17,8 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -landroid -llog")
 #             src/main/cpp/math.cpp
 #             src/main/cpp/position.cpp)
 
-add_library(position SHARED
-            src/main/cpp/position.cpp)
+#add_library(position SHARED
+#            src/main/cpp/position.cpp)
 
 #add_library(orientation SHARED
 #            src/main/cpp/gyroscope.cpp
@@ -31,7 +31,8 @@ add_library(position SHARED
 add_library(cube SHARED
             src/main/cpp/CubeG2.cpp
             src/main/cpp/cube.cpp
-            src/main/cpp/matrix.cpp)
+            src/main/cpp/matrix.cpp
+            src/main/cpp/position.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because system libraries are included in the search path by
@@ -52,7 +53,6 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        cube
-                       position
                        # orientation
                        # renderer
                        android

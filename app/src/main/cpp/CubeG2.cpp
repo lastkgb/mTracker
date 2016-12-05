@@ -14,6 +14,7 @@
 #include "cube.h"
 #include "matrix.h"
 #include "mylog.h"
+#include "position.h"
 
 auto gVertexShader =
     "attribute vec4 vPosition;\n"
@@ -158,9 +159,12 @@ int setupShaders() {
 	return 0;
 }
 
+Position gPosition;
+
 GLuint gmvP;
 int gWidth, gHeight;
 int iXangle = 0, iYangle = 0, iZangle = 0;
+float nAnglex = 0.0, nAngley = 0.0;
 float aRotate[16], aScale[16], aTranslate[16], aModelView[16], aPerspective[16], aMVP[16];
 
 extern "C" {
@@ -221,5 +225,55 @@ Java_com_example_lastkgb_mtracker_TrackerRenderer_naDrawFrame(JNIEnv* env, jclas
 	glUniformMatrix4fv(gmvP, 1, GL_FALSE, aMVP);
 
 	mCube.draw(gvPositionHandle);
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_lastkgb_mtracker_TrackerRenderer_naDrawFrame2(JNIEnv* env, jclass clazz) {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0, 0.0, 0.0, 1.0f);
+	glUseProgram(gProgram);
+
+//	GL1x: glRotatef(pAngleX, 0, 1, 0);	//rotate around y-axis
+//	GL1x: glRotatef(pAngleY, 1, 0, 0);	//rotate around x-axis
+	//rotate
+	rotate_matrix(gPosition.getX(), 0.0, 1.0, 0.0, aRotate);
+	rotate_matrix(gPosition.getY(), 1.0, 0.0, 0.0, aModelView);
+	multiply_matrix(aRotate, aModelView, aModelView);
+
+//	GL1x: glScalef(0.3f, 0.3f, 0.3f);      // Scale down
+	scale_matrix(0.5, 0.5, 0.5, aScale);
+	multiply_matrix(aScale, aModelView, aModelView);
+
+// GL1x: glTranslate(0.0f, 0.0f, -3.5f);
+	translate_matrix(0.0f, 0.0f, -3.5f, aTranslate);
+	multiply_matrix(aTranslate, aModelView, aModelView);
+
+//	gluPerspective(45, aspect, 0.1, 100);
+	perspective_matrix(45.0, (float)gWidth/(float)gHeight, 0.1, 100.0, aPerspective);
+	multiply_matrix(aPerspective, aModelView, aMVP);
+
+	glUniformMatrix4fv(gmvP, 1, GL_FALSE, aMVP);
+
+	mCube.draw(gvPositionHandle);
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_lastkgb_mtracker_TrackerRenderer_naPositionInit(JNIEnv* env, jclass clazz) {
+	gPosition.init();
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_lastkgb_mtracker_TrackerRenderer_naPositionUpdate(JNIEnv* env, jclass clazz) {
+	gPosition.updateSensor();
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_lastkgb_mtracker_TrackerRenderer_naPositionPause(JNIEnv* env, jclass clazz) {
+	gPosition.pause();
+}
+
+JNIEXPORT void JNICALL
+Java_com_example_lastkgb_mtracker_TrackerRenderer_naPositionResume(JNIEnv* env, jclass clazz) {
+	gPosition.resume();
 }
 }

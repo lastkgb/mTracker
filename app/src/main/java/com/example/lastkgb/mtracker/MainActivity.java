@@ -7,19 +7,21 @@ import android.util.Log;
 public class MainActivity extends Activity {
 
     private TrackerSurfaceView mView;
-    private Position mPosition;
+    private TrackerRenderer mRenderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mView = new TrackerSurfaceView(this);
-        mPosition = new Position(this);
-        mPosition.init(mView);
-
-        mView.setPosition(mPosition);
-        mPosition.naStart();
-
+        mRenderer = mView.getRenderer();
+        mView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                Log.i("MAIN", "[onCreate] Runnable run called");
+                mRenderer.positionInit();
+            }
+        });
         setContentView(mView);
         Log.i("MAIN", "onCreate called");
     }
@@ -27,27 +29,23 @@ public class MainActivity extends Activity {
     @Override protected void onPause() {
         super.onPause();
         mView.onPause();
-/*
         mView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                RendererJNI.pause();
+                mRenderer.pause();
             }
         });
-*/
     }
 
     @Override protected void onResume() {
         super.onResume();
         mView.onResume();
-/*
         mView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                RendererJNI.resume();
+                mRenderer.resume();
             }
         });
-*/
     }
 
     public void update(float angleX, float angleY)
