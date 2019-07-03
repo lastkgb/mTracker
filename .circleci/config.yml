@@ -28,7 +28,7 @@ jobs:
                 destination: reports
             - run:
                 name: Initial build
-                command: ./gradlew clean assembleRelease --no-daemon --stacktrace
+                command: export TERM=${TERM:-dumb} && ./gradlew clean assembleRelease --no-daemon --stacktrace
             - store_artifacts:
                 path: app/build/output/apk/
                 destination: apks/
