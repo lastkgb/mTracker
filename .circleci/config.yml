@@ -26,6 +26,22 @@ jobs:
             - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
                 path: app/build/reports
                 destination: reports
+            - run:
+                name: Initial build
+                command: ./gradlew clean assembleRelease --no-daemon --stacktrace
+            - store_artifacts:
+                path: app/build/output/apk/
+                destination: apks/
             - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
                 path: app/build/test-results
             # See https://circleci.com/doc/2.0/deployment-integrations/ for deploy examples
+#            - deploy:
+#                name: "Deploy"
+#                command: echo "Branch: ${CIRCLE_BRANCH} , PR: ${CIRCLE_PULL_REQUEST}"
+#                    if [ "${CIRCLE_BRANCH}" == "develop" -o "${CIRCLE_PULL_REQUEST}" != "" ]; then
+#                        ./gradlew crashlyticsUploadDistributionDevelopmentRelease --stacktrace --debug --no-daemon
+#                    fi
+#                    release=$(cut -c-7 <<< "${CIRCLE_BRANCH}")
+#                    if [ "$release" == "release"]; then
+#                        ./gradlew crashlyticsUploadDistributionProductionRelease --stacktrace --debug --no-daemon
+#                    fi
