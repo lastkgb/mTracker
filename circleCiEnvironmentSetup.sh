@@ -7,6 +7,8 @@ function getAndroidNDK {
   if [ ! -e ANDROID_NDK ]; then
     cd $ANDROID_HOME
     echo "Downloading NDK..."
+    sudo apt-get update
+    sudo apt-get install cmake
     sudo curl -L -o ndk.zip https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
     unzip -o -q ndk.zip
     mv android-ndk-r16b ndk-bundle
