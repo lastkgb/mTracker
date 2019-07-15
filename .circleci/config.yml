@@ -31,7 +31,7 @@ jobs:
                 command: yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;  #Captures SIGPIPE 141 error but still allow repeating "y" to accept all licenses
             - run:
                 name: Install Android NDK
-                command: source ./script/circleCiEnvironmentSetup.sh && getAndroidNDK
+                command: source ./circleCiEnvironmentSetup.sh && getAndroidNDK
             - run:
                 name: Initial build
                 command: export TERM=${TERM:-dumb} && ./gradlew clean assembleRelease --no-daemon --stacktrace
